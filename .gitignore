@@ -24,3 +24,13 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/frontend/node_modules
+/frontend/dist
+/frontend/build
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.development
+/frontend/.env.production
+/frontend/.env.test
+/frontend/.env.backup
+/frontend/.phpactor.json    
