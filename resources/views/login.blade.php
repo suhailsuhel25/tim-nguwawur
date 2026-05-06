@@ -196,11 +196,11 @@
                         const userRole = this.getRoleValue(this.role);
                         
                         if (userRole === 'student') {
-                            window.location.href = '/dashboard/mahasiswa';
+                            window.location.href = '/mahasiswa/dashboard';
                         } else if (userRole === 'lecturer') {
-                            window.location.href = '/dashboard/dosen';
+                            window.location.href = '/dosen/dashboard';
                         } else if (userRole === 'admin') {
-                            window.location.href = '/dashboard/admin';
+                            window.location.href = '/admin/dashboard';
                         }
 
                     } catch (err) {

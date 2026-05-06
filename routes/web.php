@@ -6,14 +6,20 @@ Route::get('/', function () {
     return view('login');
 });
 
-Route::get('/dashboard/mahasiswa', function () {
-    return view('dashboard.mahasiswa');
+Route::prefix('mahasiswa')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('mahasiswa.dashboard');
+    });
 });
 
-Route::get('/dashboard/dosen', function () {
-    return view('dashboard.dosen');
+Route::prefix('dosen')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dosen.dashboard');
+    });
 });
 
-Route::get('/dashboard/admin', function () {
-    return view('dashboard.admin');
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    });
 });
