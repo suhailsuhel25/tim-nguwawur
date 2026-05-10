@@ -38,14 +38,15 @@
 
     <!-- KANAN - PUTIH (Form) -->
     <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div class="w-full max-w-md" x-data="loginComponent()">
+        <div class="w-full max-w-md" x-data="{ role: 'Mahasiswa', showPassword: false }">
             
             <h2 class="text-3xl font-bold text-slate-800 mb-2">Welcome Back</h2>
             <p class="text-slate-500 mb-8">
                 Sign in to your academic portal to continue your monitoring activity.
             </p>
 
-            <form @submit.prevent="handleLogin()">
+            <form method="POST" action="/login">
+                @csrf
                 
                 <!-- Role Switcher -->
                 <div class="mb-6 border border-slate-200 rounded-lg p-1 bg-slate-50 flex">
@@ -68,7 +69,11 @@
                 </div>
 
                 <!-- Error Message -->
-                <div x-show="errorMsg" x-transition class="bg-red-50 text-red-500 text-sm p-3 rounded-lg mb-4 border border-red-200" x-text="errorMsg" style="display: none;"></div>
+                @error('username')
+                <div class="bg-red-50 text-red-500 text-sm p-3 rounded-lg mb-4 border border-red-200">
+                    {{ $message }}
+                </div>
+                @enderror
 
                 <!-- Input ID -->
                 <div class="mb-5">
@@ -82,8 +87,9 @@
                         </div>
                         <input
                             type="text"
+                            name="username"
                             required
-                            x-model="username"
+                            value="{{ old('username') }}"
                             class="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary placeholder-slate-400"
                             placeholder="Enter your ID number"
                         />
@@ -107,8 +113,8 @@
                         </div>
                         <input
                             :type="showPassword ? 'text' : 'password'"
+                            name="password"
                             required
-                            x-model="password"
                             class="block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-lg text-sm focus:ring-primary focus:border-primary placeholder-slate-400"
                             placeholder="••••••••"
                         />
@@ -127,11 +133,9 @@
                 <!-- Submit -->
                 <button
                     type="submit"
-                    :disabled="loading"
-                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
                 >
-                    <span x-show="loading">Processing...</span>
-                    <span x-show="!loading" class="flex items-center">
+                    <span class="flex items-center">
                         Sign In to Portal 
                         <!-- ArrowRight SVG -->
                         <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -141,76 +145,5 @@
         </div>
     </div>
 
-    <!-- Alpine.js Component Logic -->
-    <script>
-        function loginComponent() {
-            return {
-                role: 'Mahasiswa',
-                username: '',
-                password: '',
-                showPassword: false,
-                loading: false,
-                errorMsg: '',
-
-                getRoleValue(displayRole) {
-                    if (displayRole === 'Mahasiswa') return 'student';
-                    if (displayRole === 'Dosen') return 'lecturer';
-                    return 'admin';
-                },
-
-                async handleLogin() {
-                    this.loading = true;
-                    this.errorMsg = '';
-
-                    try {
-                        // Request menggunakan fetch seperti React
-                        const response = await fetch('/api/login', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                username: this.username,
-                                password: this.password,
-                                role: this.getRoleValue(this.role)
-                            })
-                        });
-
-                        const data = await response.json();
-
-                        if (!response.ok) {
-                            if (response.status === 401) {
-                                this.errorMsg = 'Username atau password salah.';
-                            } else {
-                                this.errorMsg = data.message || 'Terjadi kesalahan pada server. Cek koneksi.';
-                            }
-                            return;
-                        }
-
-                        // Simpan API Token
-                        localStorage.setItem('sanctum_token', data.data.token);
-                        localStorage.setItem('user', JSON.stringify(data.data.user));
-
-                        // alert('Login Sukses sebagai ' + data.data.user.name);
-                        const userRole = this.getRoleValue(this.role);
-                        
-                        if (userRole === 'student') {
-                            window.location.href = '/mahasiswa/dashboard';
-                        } else if (userRole === 'lecturer') {
-                            window.location.href = '/dosen/dashboard';
-                        } else if (userRole === 'admin') {
-                            window.location.href = '/admin/dashboard';
-                        }
-
-                    } catch (err) {
-                        this.errorMsg = 'Terjadi kesalahan jaringan.';
-                    } finally {
-                        this.loading = false;
-                    }
-                }
-            }
-        }
-    </script>
 </body>
 </html>
