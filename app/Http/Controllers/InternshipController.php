@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Internship;
 use Illuminate\Http\Request;
 
@@ -24,14 +23,11 @@ class InternshipController extends Controller
         } elseif ($user->role === 'lecturer') {
             $query->where('lecturer_id', $user->lecturer->id);
         }
-        // Admin bisa melihat semua, jadi tidak ada filter tambahan
+        // Admin bisa melihat semua
 
         $internships = $query->latest()->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $internships
-        ]);
+        return view('internships.index', compact('internships'));
     }
 
     /**
@@ -43,9 +39,8 @@ class InternshipController extends Controller
         $user = $request->user();
 
         // Hanya mahasiswa yang bisa mendaftar magang
-        // Walau harusnya validasi ini taruh di Request class/Policy, untuk simpel bisa cek di sini:
         if ($user->role !== 'student') {
-            return response()->json(['success' => false, 'message' => 'Hanya mahasiswa yang bisa mendaftar.'], 403);
+            return redirect()->back()->with('error', 'Hanya mahasiswa yang bisa mendaftar.');
         }
 
         $validated = $request->validate([
@@ -53,10 +48,8 @@ class InternshipController extends Controller
             'internship_period_id' => 'required|exists:internship_periods,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            // Dokumen divalidasi nanti via InternshipDocumentController / di handle terpisah atau disini juga bisa
         ]);
 
-        // Simpan pendaftaran dengan status otomatis 'draft' atau 'submitted'
         $internship = Internship::create([
             'student_id' => $user->student->id,
             'company_id' => $validated['company_id'],
@@ -66,11 +59,7 @@ class InternshipController extends Controller
             'status' => 'submitted', // Langsung diajukan setelah store
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Pendaftaran magang berhasil diajukan',
-            'data' => $internship
-        ], 201);
+        return redirect()->route('internships.index')->with('success', 'Pendaftaran magang berhasil diajukan');
     }
 
     /**
@@ -83,14 +72,11 @@ class InternshipController extends Controller
             'documents', 'weeklyReports', 'mentorshipSessions', 'finalGrade'
         ])->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $internship
-        ]);
+        return view('internships.show', compact('internship'));
     }
 
     /**
-     * Update the specified resource in storage. (Approval/Rejection by Lecturer / Edit by Student)
+     * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
@@ -112,14 +98,9 @@ class InternshipController extends Controller
                 'lecturer_id' => $user->lecturer->id, // Assign dosen yang mengapprove
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Status pendaftaran berhasil diperbarui',
-                'data' => $internship
-            ]);
+            return redirect()->route('internships.show', $internship->id)->with('success', 'Status pendaftaran berhasil diperbarui');
         }
 
-        // Kalau butuh flow mahasiswa update tanggal sebelum diapprove, bisa ditambahkan logic di sini
-        return response()->json(['success' => false, 'message' => 'Unauthorized action'], 403);
+        return redirect()->back()->with('error', 'Unauthorized action');
     }
 }
