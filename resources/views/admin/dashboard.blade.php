@@ -61,7 +61,18 @@
     {{-- Main Content Grid --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {{-- Recent Internships List --}}
+        {{-- Left Column: Chart & Recent Internships --}}
+        <div class="lg:col-span-2 space-y-6">
+            
+            {{-- Internship Status Chart --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6">
+                <h3 class="font-bold text-slate-800 mb-4">Statistik Pengajuan Magang</h3>
+                <div class="relative h-64 w-full flex justify-center">
+                    <canvas id="internshipChart"></canvas>
+                </div>
+            </div>
+
+            {{-- Recent Internships List --}}
         <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
             <div class="p-6 border-b border-slate-100 flex items-center justify-between">
                 <div>
@@ -128,7 +139,7 @@
             </div>
         </div>
 
-        {{-- Quick Actions & System Info --}}
+        {{-- Right Column: Actions, Reports & System Info --}}
         <div class="space-y-6">
             {{-- Quick Actions --}}
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
@@ -164,6 +175,44 @@
                 </div>
             </div>
 
+            {{-- Laporan (Reports) --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <h3 class="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">Unduh Laporan (PDF)</h3>
+                <div class="space-y-4">
+                    {{-- Rekap Nilai per Periode --}}
+                    <form action="{{ route('admin.reports.grades') }}" method="GET" class="space-y-2">
+                        <label class="block text-xs font-semibold text-slate-700">Rekap Nilai per Periode</label>
+                        <div class="flex gap-2">
+                            <select name="period_id" required class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">
+                                <option value="">-- Pilih Periode --</option>
+                                @foreach($periods as $period)
+                                    <option value="{{ $period->id }}">{{ $period->name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="shrink-0 bg-primary hover:bg-primary-dark text-white p-2.5 rounded-lg transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </button>
+                        </div>
+                    </form>
+
+                    {{-- Laporan Kegiatan per Mahasiswa --}}
+                    <form action="{{ route('admin.reports.activities') }}" method="GET" class="space-y-2 pt-2 border-t border-slate-100">
+                        <label class="block text-xs font-semibold text-slate-700">Kegiatan per Mahasiswa</label>
+                        <div class="flex gap-2">
+                            <select name="student_id" required class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">
+                                <option value="">-- Pilih Mahasiswa --</option>
+                                @foreach($students as $student)
+                                    <option value="{{ $student->id }}">{{ $student->name }} ({{ $student->username }})</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="shrink-0 bg-primary hover:bg-primary-dark text-white p-2.5 rounded-lg transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             {{-- System Info --}}
             <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-sm p-6 text-white relative overflow-hidden">
                 <svg class="absolute right-0 bottom-0 text-white/5 w-32 h-32 -mb-8 -mr-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M11 19.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.22.23-1.8L11 17v2.93zM13 4.07c3.95.49 7 3.85 7 7.93 0 .62-.08 1.22-.23 1.8L13 7V4.07z"/></svg>
@@ -186,4 +235,41 @@
         </div>
     </div>
 </div>
+
+{{-- Script for Chart.js --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('internshipChart').getContext('2d');
+        const chartData = @json($chartData);
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    data: chartData.data,
+                    backgroundColor: chartData.colors,
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { family: "'Inter', sans-serif", size: 12 }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    });
+</script>
 @endsection

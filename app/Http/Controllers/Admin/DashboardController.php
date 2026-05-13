@@ -26,6 +26,22 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentInternships'));
+        // Data for chart (Internship Status Distribution)
+        $chartData = [
+            'labels' => ['Pending', 'Approved', 'Rejected', 'Completed'],
+            'data' => [
+                Internship::where('status', 'pending')->count(),
+                Internship::where('status', 'approved')->count(),
+                Internship::where('status', 'rejected')->count(),
+                Internship::where('status', 'completed')->count(),
+            ],
+            'colors' => ['#f59e0b', '#10b981', '#ef4444', '#3b82f6'] // Tailwind amber, emerald, red, blue
+        ];
+
+        // Data for Report Export Dropdowns
+        $periods = InternshipPeriod::orderByDesc('start_date')->get();
+        $students = User::where('role', 'student')->whereHas('student.internships')->orderBy('name')->get();
+
+        return view('admin.dashboard', compact('stats', 'recentInternships', 'chartData', 'periods', 'students'));
     }
 }

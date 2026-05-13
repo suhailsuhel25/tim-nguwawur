@@ -49,5 +49,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
         Route::resource('companies', App\Http\Controllers\Admin\CompanyController::class);
         Route::resource('periods', App\Http\Controllers\Admin\InternshipPeriodController::class);
+
+        Route::get('reports/activities', [App\Http\Controllers\Admin\ReportController::class, 'activities'])->name('reports.activities');
+        Route::get('reports/grades', [App\Http\Controllers\Admin\ReportController::class, 'grades'])->name('reports.grades');
     });
 });

@@ -19,9 +19,9 @@ class DashboardController extends Controller
             'pending_reports' => WeeklyReport::whereHas('internship', function ($query) use ($lecturerId) {
                 $query->where('lecturer_id', $lecturerId);
             })->where('status', 'submitted')->count(),
-            'completed_sessions' => MentorshipSession::whereHas('internship', function ($query) use ($lecturerId) {
+            'today_sessions' => MentorshipSession::whereHas('internship', function ($query) use ($lecturerId) {
                 $query->where('lecturer_id', $lecturerId);
-            })->where('status', 'completed')->count(),
+            })->whereDate('date', today())->count(),
             'ungraded_students' => Internship::where('lecturer_id', $lecturerId)
                 ->where('status', 'approved')
                 ->whereDoesntHave('finalGrade')
