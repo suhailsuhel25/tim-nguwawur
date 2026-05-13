@@ -1,70 +1,70 @@
 # tim-nguwawur
 
-## Project Overview
-Simagang is a comprehensive internship management system designed to streamline the process of internship (PKL) monitoring for students, lecturers, and administrators. The system provides a unified platform for managing internship periods, company details, daily activities, mentorship sessions, and final assessments.
+## Gambaran Umum Proyek
+Simagang adalah sistem manajemen magang komprehensif yang dirancang untuk menyederhanakan proses pemantauan Praktik Kerja Lapangan (PKL) bagi mahasiswa, dosen, dan administrator. Sistem ini menyediakan platform terpadu untuk mengelola periode magang, detail perusahaan, aktivitas harian, sesi bimbingan, dan penilaian akhir.
 
-## Features
+## Fitur
 
-### 1. User Authentication & Role Management
-- **Three Distinct Roles**: Mahasiswa (Student), Dosen (Lecturer), and Admin.
-- **Secure Login**: Email/NIP/ID-based authentication with password security.
-- **Role-Based Redirection**: Automatically redirects users to their specific dashboard after login.
+### 1. Autentikasi Pengguna & Manajemen Peran
+- **Tiga Peran Berbeda**: Mahasiswa, Dosen, dan Admin.
+- **Login Aman**: Autentikasi berbasis Email/NIP/ID dengan keamanan kata sandi.
+- **Pengalihan Berdasarkan Peran**: Secara otomatis mengalihkan pengguna ke dasbor spesifik mereka setelah login.
 
-### 2. Mahasiswa (Student) Module
-- **Internship Application**: Apply for internships with detailed personal and academic information.
-- **Document Management**: Upload and manage required internship documents (CV, Cover Letter, etc.).
-- **Daily Activity Tracking**: Log daily activities with time tracking and status updates.
-- **Mentorship**: Schedule and track mentorship sessions with lecturers.
-- **Progress Monitoring**: View internship progress and receive notifications.
+### 2. Modul Mahasiswa
+- **Pendaftaran Magang**: Mendaftar magang dengan informasi pribadi dan akademik yang detail.
+- **Manajemen Dokumen**: Unggah dan kelola dokumen magang yang diperlukan (CV, Surat Pengantar, dll.).
+- **Pelacakan Aktivitas Harian**: Mencatat aktivitas harian dengan pelacakan waktu dan pembaruan status.
+- **Bimbingan**: Menjadwalkan dan melacak sesi bimbingan dengan dosen.
+- **Pemantauan Kemajuan**: Melihat kemajuan magang dan menerima pemberitahuan.
 
-### 3. Dosen (Lecturer) Module
-- **Mentorship Management**: Oversee and manage mentorship sessions for assigned students.
-- **Activity Monitoring**: Review student daily activities and progress reports.
-- **Notification System**: Receive real-time notifications regarding student activities and requests.
-- **Assessment**: Provide final grades and assessments for internships.
+### 3. Modul Dosen
+- **Manajemen Bimbingan**: Mengawasi dan mengelola sesi bimbingan untuk mahasiswa yang ditugaskan.
+- **Pemantauan Aktivitas**: Meninjau aktivitas harian mahasiswa dan laporan kemajuan.
+- **Sistem Pemberitahuan**: Menerima pemberitahuan waktu nyata terkait aktivitas dan permintaan mahasiswa.
+- **Penilaian**: Memberikan nilai akhir dan asesmen untuk magang.
 
-### 4. Admin Module
-- **System Configuration**: Manage internship periods and system settings.
-- **User Management**: Oversee all student and lecturer accounts.
-- **Company Management**: Add and manage partner companies.
-- **Monitoring**: Comprehensive dashboard to monitor all internship activities across the institution.
+### 4. Modul Admin
+- **Konfigurasi Sistem**: Mengelola periode magang dan pengaturan sistem.
+- **Manajemen Pengguna**: Mengawasi semua akun mahasiswa dan dosen.
+- **Manajemen Perusahaan**: Menambah dan mengelola perusahaan mitra.
+- **Pemantauan**: Dasbor komprehensif untuk memantau semua aktivitas magang di seluruh institusi.
 
-## Tech Stack
+## Tumpukan Teknologi (Tech Stack)
 - **Backend**: PHP, Laravel
 - **Frontend**: HTML, JavaScript, Tailwind CSS
 - **Database**: MySQL
 
-## Getting Started
+## Memulai
 
-### Prerequisites
+### Prasyarat
 - PHP >= 8.0
 - MySQL
 - Composer
-- Node.js & NPM (for frontend assets)
+- Node.js & NPM (untuk aset frontend)
 
-### Installation
-1. Clone the repository:
+### Instalasi
+1. Klon repositori:
    ```bash
    git clone <repository-url>
    cd tim-nguwawur
    ```
 
-2. Install PHP dependencies:
+2. Instal dependensi PHP:
    ```bash
    composer install
    ```
 
-3. Install Node.js dependencies:
+3. Instal dependensi Node.js:
    ```bash
    npm install
    ```
 
-4. Configure the environment:
-   - Copy `.env.example` to `.env`:
+4. Konfigurasi lingkungan:
+   - Salin `.env.example` menjadi `.env`:
      ```bash
      cp .env.example .env
      ```
-   - Update the database credentials in `.env`:
+   - Perbarui kredensial database di `.env`:
      ```ini
      DB_CONNECTION=mysql
      DB_HOST=127.0.0.1
@@ -74,28 +74,28 @@ Simagang is a comprehensive internship management system designed to streamline 
      DB_PASSWORD=
      ```
 
-5. Generate application key:
+5. Buat kunci aplikasi:
    ```bash
    php artisan key:generate
    ```
 
-6. Run database migrations:
+6. Jalankan migrasi database:
    ```bash
    php artisan migrate
    ```
 
-7. Serve the application:
+7. Jalankan aplikasi:
    ```bash
    php artisan serve
    ```
-   The application will be accessible at `http://localhost:8000`.
+   Aplikasi akan dapat diakses di `http://localhost:8000`.
 
-## Usage
-- **Login**: Access the login page at `http://localhost:8000/login`.
-- **Dashboards**:
-  - Student: `http://localhost:8000/mahasiswa/dashboard`
-  - Lecturer: `http://localhost:8000/dosen/dashboard`
+## Penggunaan
+- **Login**: Akses halaman login di `http://localhost:8000/login`.
+- **Dasbor**:
+  - Mahasiswa: `http://localhost:8000/mahasiswa/dashboard`
+  - Dosen: `http://localhost:8000/dosen/dashboard`
   - Admin: `http://localhost:8000/admin/dashboard`
 
-## License
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Lisensi
+Proyek ini adalah perangkat lunak sumber terbuka yang dilisensikan di bawah [lisensi MIT](https://opensource.org/licenses/MIT).
