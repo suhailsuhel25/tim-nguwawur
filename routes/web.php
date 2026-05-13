@@ -12,10 +12,13 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
+    // Notifications Routes
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+
     Route::middleware('role:student')->prefix('mahasiswa')->name('student.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('student.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Student\DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('internships', App\Http\Controllers\Student\InternshipController::class)->only(['index', 'create', 'store']);
         Route::resource('weekly_reports', App\Http\Controllers\Student\WeeklyReportController::class)->only(['index', 'create', 'store', 'show']);
@@ -25,9 +28,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:lecturer')->prefix('dosen')->name('lecturer.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('lecturer.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Lecturer\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('internships', [App\Http\Controllers\Lecturer\InternshipController::class, 'index'])->name('internships.index');
         Route::get('internships/{internship}', [App\Http\Controllers\Lecturer\InternshipController::class, 'show'])->name('internships.show');
@@ -43,9 +44,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
         Route::resource('companies', App\Http\Controllers\Admin\CompanyController::class);
