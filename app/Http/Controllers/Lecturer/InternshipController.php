@@ -73,7 +73,9 @@ class InternshipController extends Controller
             $internship->student->user_id,
             "Pengajuan Magang {$statusText}",
             "Pengajuan magang Anda di {$internship->company->name} telah {$statusText}.",
-            route('student.internships.index') // Note: need to make sure this route is correct
+            'status_update',
+            'internships',
+            $internship->id
         );
 
         return redirect()->route('lecturer.internships.index')
