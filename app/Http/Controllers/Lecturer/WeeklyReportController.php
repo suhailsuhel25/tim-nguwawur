@@ -34,10 +34,7 @@ class WeeklyReportController extends Controller
 
     public function show(WeeklyReport $weeklyReport)
     {
-        // Check authorization
-        if ($weeklyReport->internship->lecturer_id !== Auth::user()->lecturer->id) {
-            abort(403);
-        }
+        $this->authorize('view', $weeklyReport);
 
         $weeklyReport->load('dailyActivities', 'internship.student.user', 'internship.company');
 
@@ -46,14 +43,17 @@ class WeeklyReportController extends Controller
 
     public function updateStatus(UpdateWeeklyReportStatusRequest $request, WeeklyReport $weeklyReport)
     {
-        // Check authorization
-        if ($weeklyReport->internship->lecturer_id !== Auth::user()->lecturer->id) {
-            abort(403);
-        }
+        $this->authorize('view', $weeklyReport);
 
         $weeklyReport->update([
             'status' => $request->status
         ]);
+
+        \App\Services\ActivityLogService::log(
+            "validate_weekly_report",
+            "weekly_reports",
+            "Validated weekly report week {$weeklyReport->week_number} for {$weeklyReport->internship->student->user->name}"
+        );
 
         // Kirim notifikasi ke Student saat laporan divalidasi
         if ($request->status === 'validated') {

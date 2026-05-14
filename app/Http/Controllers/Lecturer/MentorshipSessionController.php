@@ -80,6 +80,12 @@ class MentorshipSessionController extends Controller
             'status'        => 'scheduled',
         ]);
 
+        \App\Services\ActivityLogService::log(
+            "create_mentorship_session",
+            "mentorship_sessions",
+            "Scheduled mentorship session on {$session->date} for {$internship->student->user->name}"
+        );
+
         // Notify Student
         NotificationService::send(
             $internship->student->user_id,
@@ -99,10 +105,7 @@ class MentorshipSessionController extends Controller
      */
     public function show(MentorshipSession $mentorshipSession)
     {
-        // Auth check
-        if ($mentorshipSession->internship->lecturer_id !== $this->lecturerId()) {
-            abort(403);
-        }
+        $this->authorize('view', $mentorshipSession);
 
         $mentorshipSession->load(['internship.student.user', 'internship.company']);
 
@@ -114,9 +117,7 @@ class MentorshipSessionController extends Controller
      */
     public function edit(MentorshipSession $mentorshipSession)
     {
-        if ($mentorshipSession->internship->lecturer_id !== $this->lecturerId()) {
-            abort(403);
-        }
+        $this->authorize('view', $mentorshipSession);
 
         $mentorshipSession->load(['internship.student.user', 'internship.company']);
 
@@ -128,13 +129,17 @@ class MentorshipSessionController extends Controller
      */
     public function update(UpdateMentorshipSessionRequest $request, MentorshipSession $mentorshipSession)
     {
-        if ($mentorshipSession->internship->lecturer_id !== $this->lecturerId()) {
-            abort(403);
-        }
+        $this->authorize('view', $mentorshipSession);
 
         $oldDate = $mentorshipSession->date;
 
         $mentorshipSession->update($request->validated());
+
+        \App\Services\ActivityLogService::log(
+            "update_mentorship_session",
+            "mentorship_sessions",
+            "Updated mentorship session {$mentorshipSession->id}"
+        );
 
         // Notify student if schedule changed
         if ($oldDate != $mentorshipSession->date) {
@@ -157,9 +162,7 @@ class MentorshipSessionController extends Controller
      */
     public function complete(Request $request, MentorshipSession $mentorshipSession)
     {
-        if ($mentorshipSession->internship->lecturer_id !== $this->lecturerId()) {
-            abort(403);
-        }
+        $this->authorize('view', $mentorshipSession);
 
         $request->validate([
             'lecturer_notes' => ['nullable', 'string', 'max:2000'],
@@ -171,6 +174,12 @@ class MentorshipSessionController extends Controller
             'lecturer_notes' => $request->lecturer_notes,
             'feedback'       => $request->feedback,
         ]);
+
+        \App\Services\ActivityLogService::log(
+            "complete_mentorship_session",
+            "mentorship_sessions",
+            "Completed mentorship session {$mentorshipSession->id}"
+        );
 
         NotificationService::send(
             $mentorshipSession->internship->student->user_id,
@@ -190,11 +199,15 @@ class MentorshipSessionController extends Controller
      */
     public function cancel(MentorshipSession $mentorshipSession)
     {
-        if ($mentorshipSession->internship->lecturer_id !== $this->lecturerId()) {
-            abort(403);
-        }
+        $this->authorize('view', $mentorshipSession);
 
         $mentorshipSession->update(['status' => 'canceled']);
+
+        \App\Services\ActivityLogService::log(
+            "cancel_mentorship_session",
+            "mentorship_sessions",
+            "Canceled mentorship session {$mentorshipSession->id}"
+        );
 
         NotificationService::send(
             $mentorshipSession->internship->student->user_id,
