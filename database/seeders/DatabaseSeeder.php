@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
             
             Lecturer::create([
                 'user_id' => $dosen->id,
+                'study_program' => $faker->randomElement(Student::STUDY_PROGRAMS),
                 'phone_number' => $faker->phoneNumber,
             ]);
         }
@@ -55,7 +56,7 @@ class DatabaseSeeder extends Seeder
             
             Student::create([
                 'user_id' => $mahasiswa->id,
-                'study_program' => $faker->randomElement(['Teknik Informatika', 'Sistem Informasi', 'Manajemen Informatika']),
+                'study_program' => $faker->randomElement(Student::STUDY_PROGRAMS),
                 'cohort_year' => $faker->randomElement(['2022', '2023']),
                 'phone_number' => $faker->phoneNumber,
             ]);

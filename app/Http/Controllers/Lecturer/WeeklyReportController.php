@@ -78,4 +78,18 @@ class WeeklyReportController extends Controller
         return redirect()->route('lecturer.weekly_reports.show', $weeklyReport)
             ->with('success', 'Status laporan berhasil diperbarui.');
     }
+
+    public function downloadDocument(WeeklyReport $weeklyReport)
+    {
+        // Check authorization
+        if ($weeklyReport->internship->lecturer_id !== Auth::user()->lecturer->id) {
+            abort(403);
+        }
+
+        if (!$weeklyReport->document_path || !\Illuminate\Support\Facades\Storage::exists($weeklyReport->document_path)) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        return \Illuminate\Support\Facades\Storage::response($weeklyReport->document_path);
+    }
 }

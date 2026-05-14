@@ -127,36 +127,41 @@
                 </h3>
                 <div class="space-y-4">
 
+                    {{-- Program Studi (untuk Mahasiswa dan Dosen) --}}
+                    <div>
+                        <label for="study_program" class="block text-sm font-medium text-slate-700 mb-1">
+                            Program Studi <span class="text-red-500">*</span>
+                        </label>
+                        <select name="study_program" id="study_program"
+                                class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                                       {{ $errors->has('study_program') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
+                            <option value="">-- Pilih Program Studi --</option>
+                            @foreach(\App\Models\Student::STUDY_PROGRAMS as $program)
+                                <option value="{{ $program }}" {{ old('study_program') == $program ? 'selected' : '' }}>
+                                    {{ $program }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('study_program')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     {{-- Fields khusus Mahasiswa --}}
                     <div x-show="role === 'student'" x-transition class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="study_program" class="block text-sm font-medium text-slate-700 mb-1">
-                                    Program Studi <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="study_program" id="study_program"
-                                       value="{{ old('study_program') }}"
-                                       placeholder="Contoh: Teknik Informatika"
-                                       class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                                              {{ $errors->has('study_program') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
-                                @error('study_program')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label for="cohort_year" class="block text-sm font-medium text-slate-700 mb-1">
-                                    Angkatan <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" name="cohort_year" id="cohort_year"
-                                       value="{{ old('cohort_year') }}"
-                                       placeholder="Contoh: 2023"
-                                       min="2000" max="2099"
-                                       class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                                              {{ $errors->has('cohort_year') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
-                                @error('cohort_year')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <div>
+                            <label for="cohort_year" class="block text-sm font-medium text-slate-700 mb-1">
+                                Angkatan <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" name="cohort_year" id="cohort_year"
+                                   value="{{ old('cohort_year') }}"
+                                   placeholder="Contoh: 2023"
+                                   min="2000" max="2099"
+                                   class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                                          {{ $errors->has('cohort_year') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
+                            @error('cohort_year')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

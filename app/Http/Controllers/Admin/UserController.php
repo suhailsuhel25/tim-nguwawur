@@ -69,8 +69,9 @@ class UserController extends Controller
                 ]);
             } elseif ($request->role === 'lecturer') {
                 Lecturer::create([
-                    'user_id'      => $user->id,
-                    'phone_number' => $request->phone_number,
+                    'user_id'       => $user->id,
+                    'study_program' => $request->study_program,
+                    'phone_number'  => $request->phone_number,
                 ]);
             }
         });
@@ -113,7 +114,8 @@ class UserController extends Controller
                 ]);
             } elseif ($user->role === 'lecturer' && $user->lecturer) {
                 $user->lecturer->update([
-                    'phone_number' => $request->phone_number,
+                    'study_program' => $request->study_program,
+                    'phone_number'  => $request->phone_number,
                 ]);
             }
         });

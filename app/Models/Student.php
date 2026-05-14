@@ -11,6 +11,16 @@ class Student extends Model
 {
     use SoftDeletes;
 
+    public const STUDY_PROGRAMS = [
+        'Matematika',
+        'Biologi',
+        'Fisika',
+        'Kimia',
+        'Teknik Lingkungan',
+        'Gizi',
+        'Teknologi Informasi',
+    ];
+
     protected $guarded = ['id'];
 
     public function user(): BelongsTo

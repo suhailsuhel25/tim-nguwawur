@@ -39,6 +39,9 @@
                 @elseif($weeklyReport->status === 'validated')
                     <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-200">Tervalidasi</span>
                 @endif
+                @if($weeklyReport->is_late)
+                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full border border-red-200 ml-2">Terlambat</span>
+                @endif
             </div>
             
             <div class="p-5">
@@ -105,6 +108,21 @@
                 <div>
                     <span class="block font-semibold text-slate-800 mb-1">Rencana Minggu Depan</span>
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 whitespace-pre-wrap">{{ $weeklyReport->next_week_plan }}</div>
+                </div>
+                @endif
+                
+                @if($weeklyReport->document_path)
+                <div class="pt-4 border-t border-slate-100 mt-4">
+                    <span class="block font-semibold text-slate-800 mb-2">Dokumentasi Lampiran</span>
+                    <a href="{{ route('lecturer.weekly_reports.download', $weeklyReport) }}" target="_blank" class="inline-flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all w-full sm:w-auto">
+                        <div class="h-10 w-10 bg-white rounded shadow-sm flex items-center justify-center text-blue-600 border border-blue-100 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">Lihat File Lampiran</p>
+                            <p class="text-xs text-slate-500">Klik untuk melihat dokumen</p>
+                        </div>
+                    </a>
                 </div>
                 @endif
             </div>

@@ -150,16 +150,89 @@
                     <h3 class="font-semibold text-slate-800 border-b border-slate-100 pb-3 mb-4">Status Review</h3>
                     
                     @if($internship->status === 'approved')
-                        <div class="flex items-center gap-3 mb-3">
+                        <div class="flex items-center gap-3 mb-6">
                             <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-green-800">Disetujui</p>
-                                <p class="text-xs text-slate-500">Anda adalah dosen pembimbing untuk magang ini.</p>
+                                <p class="text-sm font-bold text-green-800">Magang Aktif</p>
+                                <p class="text-xs text-slate-500">Mahasiswa sedang melaksanakan magang.</p>
                             </div>
+                        </div>
+
+                        <hr class="border-slate-100 mb-6">
+
+                        {{-- Grading Form --}}
+                        <div class="space-y-4">
+                            <h4 class="text-sm font-bold text-slate-800 mb-3">Penilaian Akhir</h4>
+                            <form action="{{ route('lecturer.internships.grade', $internship) }}" method="POST" class="space-y-4">
+                                @csrf
+                                <div>
+                                    <label for="report_grade" class="block text-xs font-medium text-slate-500 mb-1">Nilai Laporan (40%)</label>
+                                    <input type="number" name="report_grade" id="report_grade" min="0" max="100" step="0.01" required
+                                           class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                </div>
+                                <div>
+                                    <label for="presentation_grade" class="block text-xs font-medium text-slate-500 mb-1">Nilai Presentasi (30%)</label>
+                                    <input type="number" name="presentation_grade" id="presentation_grade" min="0" max="100" step="0.01" required
+                                           class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                </div>
+                                <div>
+                                    <label for="attitude_grade" class="block text-xs font-medium text-slate-500 mb-1">Nilai Sikap/Perilaku (30%)</label>
+                                    <input type="number" name="attitude_grade" id="attitude_grade" min="0" max="100" step="0.01" required
+                                           class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                                </div>
+                                <div>
+                                    <label for="notes" class="block text-xs font-medium text-slate-500 mb-1">Catatan Tambahan</label>
+                                    <textarea name="notes" id="notes" rows="3" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Opsional..."></textarea>
+                                </div>
+                                <button type="submit" class="w-full py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors shadow-sm"
+                                        onclick="return confirm('Apakah Anda yakin ingin menyimpan nilai akhir ini? Status magang akan menjadi SELESAI.')">
+                                    Simpan & Selesaikan Magang
+                                </button>
+                            </form>
+                        </div>
+                    @elseif($internship->status === 'finished')
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-emerald-800">Selesai & Dinilai</p>
+                                <p class="text-xs text-slate-500">Mahasiswa telah menyelesaikan magang.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Nilai Akhir</span>
+                                <span class="text-2xl font-black text-primary">{{ number_format($internship->finalGrade->final_grade, 2) }}</span>
+                            </div>
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Laporan (40%)</span>
+                                    <span class="font-bold text-slate-700">{{ $internship->finalGrade->report_grade }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Presentasi (30%)</span>
+                                    <span class="font-bold text-slate-700">{{ $internship->finalGrade->presentation_grade }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Sikap (30%)</span>
+                                    <span class="font-bold text-slate-700">{{ $internship->finalGrade->attitude_grade }}</span>
+                                </div>
+                            </div>
+                            @if($internship->finalGrade->notes)
+                                <div class="mt-4 pt-4 border-t border-slate-200">
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-1">Catatan Dosen</p>
+                                    <p class="text-xs text-slate-700 italic">"{{ $internship->finalGrade->notes }}"</p>
+                                </div>
+                            @endif
                         </div>
                     @else
                         <div class="flex items-start gap-3 mb-3">
