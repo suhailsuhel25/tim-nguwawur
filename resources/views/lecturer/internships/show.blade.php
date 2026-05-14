@@ -9,7 +9,7 @@
 
     {{-- Page Header --}}
     <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('lecturer.internships.index') }}"
+        <a href="{{ $internship->status === 'submitted' ? route('lecturer.internships.index') : route('lecturer.students.index') }}"
            class="h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -78,7 +78,7 @@
                 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     @forelse($internship->documents as $document)
-                        <a href="{{ Storage::url($document->file_path) }}" target="_blank"
+                        <a href="{{ route('lecturer.internships.view_document', $document) }}" target="_blank"
                            class="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-primary transition-colors text-center group">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-400 group-hover:text-primary mb-2 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -255,5 +255,58 @@
         </div>
 
     </div>
+
+    {{-- Weekly Reports History (Hanya muncul jika sudah disetujui/selesai) --}}
+    @if($internship->status !== 'submitted')
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-6">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800">Riwayat Laporan Mingguan</h3>
+                <span class="text-xs font-medium text-slate-500">{{ $internship->weeklyReports->count() }} Laporan Terkumpul</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="text-left px-5 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wider">Minggu</th>
+                            <th class="text-left px-5 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wider">Rentang Tanggal</th>
+                            <th class="text-left px-5 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</th>
+                            <th class="text-left px-5 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wider">Catatan</th>
+                            <th class="text-left px-5 py-3 font-semibold text-slate-500 text-xs uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($internship->weeklyReports as $report)
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-5 py-4 font-bold text-slate-700">Ke-{{ $report->week_number }}</td>
+                                <td class="px-5 py-4 text-slate-600 text-xs">
+                                    {{ \Carbon\Carbon::parse($report->start_date)->translatedFormat('d M') }} - {{ \Carbon\Carbon::parse($report->end_date)->translatedFormat('d M Y') }}
+                                </td>
+                                <td class="px-5 py-4">
+                                    @if($report->is_late)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 uppercase tracking-tighter">Terlambat</span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 uppercase tracking-tighter">Tepat Waktu</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4 text-slate-500 text-xs truncate max-w-[200px]">
+                                    {{ $report->notes ?? '-' }}
+                                </td>
+                                <td class="px-5 py-4">
+                                    <a href="{{ route('lecturer.weekly_reports.show', $report) }}"
+                                       class="text-primary font-bold hover:underline">Detail</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-5 py-8 text-center text-slate-400 italic">
+                                    Belum ada laporan mingguan yang dikirimkan.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

@@ -21,43 +21,44 @@ class InternshipController extends Controller
         $user = request()->user();
         $lecturer = $user->lecturer;
 
-        // Show applications from the same study_program
-        $query = Internship::with(['student.user', 'company', 'internshipPeriod'])
+        $pendingInternships = Internship::with(['student.user', 'company', 'internshipPeriod'])
+            ->where('status', 'submitted')
             ->whereHas('student', function ($q) use ($lecturer) {
                 $q->where('study_program', $lecturer->study_program);
-            });
+            })
+            ->latest()
+            ->get();
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        } else {
-            $query->where('status', 'submitted');
-        }
+        $historyInternships = Internship::with(['student.user', 'company', 'internshipPeriod', 'lecturer.user'])
+            ->whereIn('status', ['approved', 'rejected', 'finished'])
+            ->whereHas('student', function ($q) use ($lecturer) {
+                $q->where('study_program', $lecturer->study_program);
+            })
+            ->latest()
+            ->paginate(10, ['*'], 'history_page');
 
-        $internships = $query->latest()->paginate(10)->withQueryString();
-
-        return view('lecturer.internships.index', compact('internships'));
+        return view('lecturer.internships.index', compact('pendingInternships', 'historyInternships'));
     }
 
     /**
-     * Display a listing of students assigned to the lecturer.
+     * Display a listing of assigned students (mentees).
      */
-    public function myStudents(Request $request)
+    public function students(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = request()->user();
         $lecturer = $user->lecturer;
 
         $query = Internship::with(['student.user', 'company', 'internshipPeriod', 'finalGrade'])
-            ->where('lecturer_id', $lecturer->id)
-            ->whereIn('status', ['approved', 'finished']);
+            ->where('lecturer_id', $lecturer->id);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $students = $query->latest()->paginate(10)->withQueryString();
+        $internships = $query->latest()->paginate(10)->withQueryString();
 
-        return view('lecturer.students.index', compact('students'));
+        return view('lecturer.students.index', compact('internships'));
     }
 
     /**
@@ -68,17 +69,16 @@ class InternshipController extends Controller
         $lecturer = request()->user()->lecturer;
         $internship->load('student');
 
-        if ($internship->status === 'submitted') {
-            if ($internship->student->study_program !== $lecturer->study_program) {
-                abort(403, 'Anda tidak berhak melihat pengajuan dari prodi lain.');
-            }
-        } else {
-            if ($internship->lecturer_id !== $lecturer->id) {
-                abort(403, 'Anda tidak berhak melihat data mahasiswa ini.');
-            }
+        if ($internship->status === 'submitted' && $internship->student->study_program !== $lecturer->study_program) {
+            abort(403, 'Anda tidak berhak melihat pengajuan dari prodi lain.');
+        }
+        if ($internship->status !== 'submitted' && $internship->lecturer_id !== $lecturer->id) {
+            abort(403, 'Anda tidak berhak melihat pengajuan ini.');
         }
 
-        $internship->load(['student.user', 'company', 'internshipPeriod', 'documents']);
+        $internship->load(['student.user', 'company', 'internshipPeriod', 'documents', 'weeklyReports' => function($q) {
+            $q->latest();
+        }]);
         return view('lecturer.internships.show', compact('internship'));
     }
 
@@ -189,5 +189,52 @@ class InternshipController extends Controller
         );
 
         return redirect()->back()->with('success', 'Nilai akhir berhasil disimpan.');
+    }
+
+    /**
+     * View or download an internship document.
+     */
+    public function viewDocument(\App\Models\InternshipDocument $document)
+    {
+        /** @var \App\Models\User $user */
+        $user = request()->user();
+        $lecturer = $user->lecturer;
+
+        $internship = $document->internship;
+
+        // Check if lecturer is assigned to this student OR is from the same study program (if it's a new application)
+        if ($internship->lecturer_id !== $lecturer->id) {
+            $student = $internship->student;
+            if ($internship->status !== 'submitted' || $student->study_program !== $lecturer->study_program) {
+                abort(403, 'Anda tidak berhak melihat dokumen ini.');
+            }
+        }
+
+        if (!\Illuminate\Support\Facades\Storage::exists($document->file_path)) {
+            abort(404, 'File tidak ditemukan di server.');
+        }
+
+        return \Illuminate\Support\Facades\Storage::response($document->file_path);
+    }
+
+    /**
+     * Dedicated detail page for assigned mentees.
+     */
+    public function studentShow(Internship $internship)
+    {
+        /** @var \App\Models\User $user */
+        $user = request()->user();
+        $lecturer = $user->lecturer;
+
+        // Security check: only mentees assigned to this lecturer
+        if ($internship->lecturer_id !== $lecturer->id) {
+            abort(403, 'Mahasiswa ini bukan bimbingan Anda.');
+        }
+
+        $internship->load(['student.user', 'company', 'internshipPeriod', 'documents', 'weeklyReports' => function($q) {
+            $q->latest();
+        }, 'finalGrade']);
+
+        return view('lecturer.students.show', compact('internship'));
     }
 }

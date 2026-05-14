@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Lecturer\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('internships', [App\Http\Controllers\Lecturer\InternshipController::class, 'index'])->name('internships.index');
-        Route::get('students', [App\Http\Controllers\Lecturer\InternshipController::class, 'myStudents'])->name('students.index');
+        Route::get('students', [App\Http\Controllers\Lecturer\InternshipController::class, 'students'])->name('students.index');
         Route::get('internships/{internship}', [App\Http\Controllers\Lecturer\InternshipController::class, 'show'])->name('internships.show');
         Route::put('internships/{internship}/status', [App\Http\Controllers\Lecturer\InternshipController::class, 'updateStatus'])->name('internships.update_status');
         Route::post('internships/{internship}/grade', [App\Http\Controllers\Lecturer\InternshipController::class, 'grade'])->name('internships.grade');
@@ -45,6 +45,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('mentorship_sessions', App\Http\Controllers\Lecturer\MentorshipSessionController::class)->except(['destroy'])->parameters(['mentorship_sessions' => 'mentorshipSession']);
         Route::put('mentorship_sessions/{mentorshipSession}/complete', [App\Http\Controllers\Lecturer\MentorshipSessionController::class, 'complete'])->name('mentorship_sessions.complete');
         Route::put('mentorship_sessions/{mentorshipSession}/cancel', [App\Http\Controllers\Lecturer\MentorshipSessionController::class, 'cancel'])->name('mentorship_sessions.cancel');
+        
+        Route::get('documents/{document}', [App\Http\Controllers\Lecturer\InternshipController::class, 'viewDocument'])->name('internships.view_document');
+        Route::get('students/{internship}', [App\Http\Controllers\Lecturer\InternshipController::class, 'studentShow'])->name('students.show');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

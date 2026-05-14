@@ -12,7 +12,7 @@
     <h1 class="text-4xl font-bold text-slate-800 mb-2">403</h1>
     <h2 class="text-xl font-semibold text-slate-600 mb-4">Akses Ditolak</h2>
     <p class="text-slate-500 max-w-md mx-auto mb-8">Maaf, Anda tidak memiliki izin untuk mengakses halaman ini atau melihat data tersebut.</p>
-    <a href="{{ route(Auth::user()->role . '.dashboard') }}" class="px-6 py-2.5 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-colors">
+    <a href="{{ Auth::check() ? route(Auth::user()->role . '.dashboard') : route('login') }}" class="px-6 py-2.5 bg-primary text-white rounded-xl font-medium hover:bg-primary-dark transition-colors">
         Kembali ke Dashboard
     </a>
 </div>
