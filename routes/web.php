@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Lecturer\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('internships', [App\Http\Controllers\Lecturer\InternshipController::class, 'index'])->name('internships.index');
+        Route::get('students', [App\Http\Controllers\Lecturer\InternshipController::class, 'myStudents'])->name('students.index');
         Route::get('internships/{internship}', [App\Http\Controllers\Lecturer\InternshipController::class, 'show'])->name('internships.show');
         Route::put('internships/{internship}/status', [App\Http\Controllers\Lecturer\InternshipController::class, 'updateStatus'])->name('internships.update_status');
         Route::post('internships/{internship}/grade', [App\Http\Controllers\Lecturer\InternshipController::class, 'grade'])->name('internships.grade');

@@ -1,8 +1,8 @@
-{{-- resources/views/lecturer/internships/index.blade.php --}}
+{{-- resources/views/lecturer/students/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Daftar Pengajuan Magang - Simagang')
-@section('header_title', 'Daftar Pengajuan Magang')
+@section('title', 'Mahasiswa Bimbingan - Simagang')
+@section('header_title', 'Mahasiswa Bimbingan')
 
 @section('content')
 <div class="space-y-6">
@@ -10,24 +10,30 @@
     {{-- Page Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h2 class="text-xl font-bold text-slate-800">Daftar Pengajuan Magang Prodi</h2>
-            <p class="text-sm text-slate-500 mt-1">Daftar mahasiswa satu program studi yang mengajukan magang dan membutuhkan validasi.</p>
+            <h2 class="text-xl font-bold text-slate-800">Daftar Mahasiswa Bimbingan Anda</h2>
+            <p class="text-sm text-slate-500 mt-1">Kelola dan pantau progres mahasiswa yang sedang melaksanakan magang di bawah bimbingan Anda.</p>
         </div>
     </div>
 
     {{-- Filter & Search --}}
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-        <form method="GET" action="{{ route('lecturer.internships.index') }}" class="flex flex-col sm:flex-row gap-3">
+        <form method="GET" action="{{ route('lecturer.students.index') }}" class="flex flex-col sm:flex-row gap-3">
             <select name="status" id="filter-status"
                     class="px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
-                <option value="submitted" {{ request('status') === 'submitted' ? 'selected' : '' }}>Menunggu Validasi</option>
-                <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Telah Disetujui</option>
-                <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                <option value="">Semua Status</option>
+                <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Aktif (Magang)</option>
+                <option value="finished" {{ request('status') === 'finished' ? 'selected' : '' }}>Selesai</option>
             </select>
             <button type="submit"
                     class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors">
                 Filter
             </button>
+            @if(request('status'))
+                <a href="{{ route('lecturer.students.index') }}"
+                   class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors">
+                    Reset
+                </a>
+            @endif
         </form>
     </div>
 
@@ -46,10 +52,10 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse($internships as $internship)
+                    @forelse($students as $internship)
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="px-5 py-4 text-slate-400 tabular-nums">
-                                {{ $internships->firstItem() + $loop->index }}
+                                {{ $students->firstItem() + $loop->index }}
                             </td>
                             <td class="px-5 py-4">
                                 <div class="font-medium text-slate-800">{{ $internship->student->user->name }}</div>
@@ -64,12 +70,10 @@
                                 <div>{{ \Carbon\Carbon::parse($internship->start_date)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($internship->end_date)->translatedFormat('d M Y') }}</div>
                             </td>
                             <td class="px-5 py-4">
-                                @if($internship->status === 'submitted')
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"> Menunggu </span>
-                                @elseif($internship->status === 'approved')
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"> Disetujui </span>
-                                @elseif($internship->status === 'rejected')
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"> Ditolak </span>
+                                @if($internship->status === 'approved')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"> Aktif </span>
+                                @elseif($internship->status === 'finished')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"> Selesai ({{ number_format($internship->finalGrade?->final_grade ?? 0, 1) }}) </span>
                                 @else
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600"> {{ ucfirst($internship->status) }} </span>
                                 @endif
@@ -82,7 +86,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
-                                        {{ $internship->status === 'submitted' ? 'Review' : 'Detail' }}
+                                        Detail
                                     </a>
                                 </div>
                             </td>
@@ -92,9 +96,9 @@
                             <td colspan="6" class="px-5 py-8 text-center text-slate-500">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
-                                    <p>Tidak ada data pengajuan magang.</p>
+                                    <p>Anda belum memiliki mahasiswa bimbingan.</p>
                                 </div>
                             </td>
                         </tr>
@@ -102,9 +106,9 @@
                 </tbody>
             </table>
         </div>
-        @if($internships->hasPages())
+        @if($students->hasPages())
             <div class="px-5 py-4 border-t border-slate-200">
-                {{ $internships->links() }}
+                {{ $students->links() }}
             </div>
         @endif
     </div>

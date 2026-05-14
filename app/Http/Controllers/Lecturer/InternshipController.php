@@ -15,39 +15,49 @@ use Illuminate\Support\Facades\DB;
 
 class InternshipController extends Controller
 {
-    /**
-     * Display a listing of upcoming applications.
-     */
     public function index(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = request()->user();
         $lecturer = $user->lecturer;
 
+        // Show applications from the same study_program
         $query = Internship::with(['student.user', 'company', 'internshipPeriod'])
-            ->where(function ($q) use ($lecturer) {
-                // Show submitted (pending) only for the same study_program, or show their own assigned
-                $q->where(function ($q2) use ($lecturer) {
-                    $q2->where('status', 'submitted')
-                       ->whereHas('student', function ($q3) use ($lecturer) {
-                           $q3->where('study_program', $lecturer->study_program);
-                       });
-                })
-                ->orWhere('lecturer_id', $lecturer->id);
+            ->whereHas('student', function ($q) use ($lecturer) {
+                $q->where('study_program', $lecturer->study_program);
             });
 
         if ($request->filled('status')) {
-            $status = $request->status;
-            if ($status === 'pending') {
-                $query->where('status', 'submitted');
-            } else {
-                $query->where('status', $status);
-            }
+            $query->where('status', $request->status);
+        } else {
+            $query->where('status', 'submitted');
         }
 
         $internships = $query->latest()->paginate(10)->withQueryString();
 
         return view('lecturer.internships.index', compact('internships'));
+    }
+
+    /**
+     * Display a listing of students assigned to the lecturer.
+     */
+    public function myStudents(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = request()->user();
+        $lecturer = $user->lecturer;
+
+        $query = Internship::with(['student.user', 'company', 'internshipPeriod', 'finalGrade'])
+            ->where('lecturer_id', $lecturer->id)
+            ->whereIn('status', ['approved', 'finished']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $students = $query->latest()->paginate(10)->withQueryString();
+
+        return view('lecturer.students.index', compact('students'));
     }
 
     /**
@@ -58,11 +68,14 @@ class InternshipController extends Controller
         $lecturer = request()->user()->lecturer;
         $internship->load('student');
 
-        if ($internship->status === 'submitted' && $internship->student->study_program !== $lecturer->study_program) {
-            abort(403, 'Anda tidak berhak melihat pengajuan dari prodi lain.');
-        }
-        if ($internship->status !== 'submitted' && $internship->lecturer_id !== $lecturer->id) {
-            abort(403, 'Anda tidak berhak melihat pengajuan ini.');
+        if ($internship->status === 'submitted') {
+            if ($internship->student->study_program !== $lecturer->study_program) {
+                abort(403, 'Anda tidak berhak melihat pengajuan dari prodi lain.');
+            }
+        } else {
+            if ($internship->lecturer_id !== $lecturer->id) {
+                abort(403, 'Anda tidak berhak melihat data mahasiswa ini.');
+            }
         }
 
         $internship->load(['student.user', 'company', 'internshipPeriod', 'documents']);
