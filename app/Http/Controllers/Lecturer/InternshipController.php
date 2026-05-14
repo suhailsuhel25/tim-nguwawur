@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Lecturer\UpdateInternshipStatusRequest;
 use App\Models\Internship;
 use App\Services\NotificationService;
-use App\Services\ActivityLogService;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
 class InternshipController extends Controller
@@ -48,7 +48,6 @@ class InternshipController extends Controller
      */
     public function show(Internship $internship)
     {
-        $this->authorize('view', $internship);
         $internship->load(['student.user', 'company', 'internshipPeriod', 'documents']);
         return view('lecturer.internships.show', compact('internship'));
     }
@@ -58,8 +57,6 @@ class InternshipController extends Controller
      */
     public function updateStatus(UpdateInternshipStatusRequest $request, Internship $internship)
     {
-        $this->authorize('view', $internship);
-        
         /** @var \App\Models\User $user */
         $user = request()->user();
         $lecturer = $user->lecturer;
@@ -72,12 +69,6 @@ class InternshipController extends Controller
 
         $statusText = $request->status === 'approved' ? 'disetujui' : 'ditolak';
         
-        ActivityLogService::log(
-            "update_internship_status",
-            "internship",
-            "Updated internship status to {$request->status} for {$internship->student->user->name}"
-        );
-
         // Kirim Notifikasi via NotificationService
         NotificationService::send(
             $internship->student->user_id,
@@ -88,8 +79,14 @@ class InternshipController extends Controller
             $internship->id
         );
 
+        // Log Activity
+        ActivityLogger::log(
+            "internship_{$request->status}",
+            "Pengajuan magang {$internship->student->user->name} di {$internship->company->name} {$statusText}",
+            $internship
+        );
+
         return redirect()->route('lecturer.internships.index')
             ->with('success', "Pengajuan magang berhasil {$statusText}.");
     }
 }
-

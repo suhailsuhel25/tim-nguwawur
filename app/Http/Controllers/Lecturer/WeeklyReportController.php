@@ -8,6 +8,7 @@ use App\Models\Internship;
 use App\Http\Requests\Lecturer\UpdateWeeklyReportStatusRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ActivityLogger;
 
 class WeeklyReportController extends Controller
 {
@@ -34,7 +35,10 @@ class WeeklyReportController extends Controller
 
     public function show(WeeklyReport $weeklyReport)
     {
-        $this->authorize('view', $weeklyReport);
+        // Check authorization
+        if ($weeklyReport->internship->lecturer_id !== Auth::user()->lecturer->id) {
+            abort(403);
+        }
 
         $weeklyReport->load('dailyActivities', 'internship.student.user', 'internship.company');
 
@@ -43,17 +47,14 @@ class WeeklyReportController extends Controller
 
     public function updateStatus(UpdateWeeklyReportStatusRequest $request, WeeklyReport $weeklyReport)
     {
-        $this->authorize('view', $weeklyReport);
+        // Check authorization
+        if ($weeklyReport->internship->lecturer_id !== Auth::user()->lecturer->id) {
+            abort(403);
+        }
 
         $weeklyReport->update([
             'status' => $request->status
         ]);
-
-        \App\Services\ActivityLogService::log(
-            "validate_weekly_report",
-            "weekly_reports",
-            "Validated weekly report week {$weeklyReport->week_number} for {$weeklyReport->internship->student->user->name}"
-        );
 
         // Kirim notifikasi ke Student saat laporan divalidasi
         if ($request->status === 'validated') {
@@ -66,6 +67,13 @@ class WeeklyReportController extends Controller
                 $weeklyReport->id
             );
         }
+
+        // Log Activity
+        ActivityLogger::log(
+            "weekly_report_{$request->status}",
+            "Validasi laporan mingguan ke-{$weeklyReport->week_number} dari mahasiswa {$weeklyReport->internship->student->user->name}",
+            $weeklyReport
+        );
 
         return redirect()->route('lecturer.weekly_reports.show', $weeklyReport)
             ->with('success', 'Status laporan berhasil diperbarui.');
