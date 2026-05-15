@@ -8,6 +8,7 @@ use App\Models\Internship;
 use App\Http\Requests\Lecturer\UpdateWeeklyReportStatusRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ActivityLogger;
 
 class WeeklyReportController extends Controller
 {
@@ -67,7 +68,28 @@ class WeeklyReportController extends Controller
             );
         }
 
+        // Log Activity
+        ActivityLogger::log(
+            "weekly_report_{$request->status}",
+            "Validasi laporan mingguan ke-{$weeklyReport->week_number} dari mahasiswa {$weeklyReport->internship->student->user->name}",
+            $weeklyReport
+        );
+
         return redirect()->route('lecturer.weekly_reports.show', $weeklyReport)
             ->with('success', 'Status laporan berhasil diperbarui.');
+    }
+
+    public function downloadDocument(WeeklyReport $weeklyReport)
+    {
+        // Check authorization
+        if ($weeklyReport->internship->lecturer_id !== Auth::user()->lecturer->id) {
+            abort(403);
+        }
+
+        if (!$weeklyReport->document_path || !\Illuminate\Support\Facades\Storage::exists($weeklyReport->document_path)) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        return \Illuminate\Support\Facades\Storage::response($weeklyReport->document_path);
     }
 }

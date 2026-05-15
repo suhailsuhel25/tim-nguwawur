@@ -23,7 +23,7 @@ class StoreUserRequest extends FormRequest
             'username'      => ['required', 'string', 'max:50', 'unique:users,username'],
             'password'      => ['required', 'string', 'min:8', 'confirmed'],
             'role'          => ['required', 'in:student,lecturer'],
-            'study_program' => ['required_if:role,student', 'nullable', 'string', 'max:100'],
+            'study_program' => ['required', 'string', \Illuminate\Validation\Rule::in(\App\Models\Student::STUDY_PROGRAMS)],
             'cohort_year'   => ['required_if:role,student', 'nullable', 'digits:4', 'integer'],
             'phone_number'  => ['nullable', 'string', 'max:20'],
         ];
@@ -45,7 +45,7 @@ class StoreUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'study_program.required_if' => 'Program Studi wajib diisi untuk mahasiswa.',
+            'study_program.required' => 'Program Studi wajib diisi.',
             'cohort_year.required_if'   => 'Angkatan wajib diisi untuk mahasiswa.',
         ];
     }
