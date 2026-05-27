@@ -25,7 +25,7 @@ class UpdateUserRequest extends FormRequest
             'name'          => ['required', 'string', 'max:255'],
             'username'      => ['required', 'string', 'max:50', Rule::unique('users', 'username')->ignore($userId)],
             'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
-            'study_program' => ['nullable', 'string', 'max:100'],
+            'study_program' => ['required', 'string', Rule::in(\App\Models\Student::STUDY_PROGRAMS)],
             'cohort_year'   => ['nullable', 'digits:4', 'integer'],
             'phone_number'  => ['nullable', 'string', 'max:20'],
         ];

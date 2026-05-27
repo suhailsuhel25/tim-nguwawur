@@ -10,6 +10,7 @@ use App\Http\Requests\Lecturer\UpdateMentorshipSessionRequest;
 use App\Models\Internship;
 use App\Models\MentorshipSession;
 use App\Services\NotificationService;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -181,6 +182,12 @@ class MentorshipSessionController extends Controller
             $mentorshipSession->id
         );
 
+        ActivityLogger::log(
+            "mentorship_session_completed",
+            "Menyelesaikan sesi bimbingan dengan mahasiswa {$mentorshipSession->internship->student->user->name}",
+            $mentorshipSession
+        );
+
         return redirect()->route('lecturer.mentorship_sessions.show', $mentorshipSession)
             ->with('success', 'Sesi bimbingan ditandai selesai.');
     }
@@ -203,6 +210,12 @@ class MentorshipSessionController extends Controller
             'warning',
             'mentorship_sessions',
             $mentorshipSession->id
+        );
+
+        ActivityLogger::log(
+            "mentorship_session_canceled",
+            "Membatalkan sesi bimbingan dengan mahasiswa {$mentorshipSession->internship->student->user->name}",
+            $mentorshipSession
         );
 
         return redirect()->route('lecturer.mentorship_sessions.index')

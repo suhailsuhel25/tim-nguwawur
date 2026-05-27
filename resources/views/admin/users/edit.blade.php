@@ -120,35 +120,42 @@
                 </h3>
                 <div class="space-y-4">
 
-                    @if($user->role === 'student')
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="study_program" class="block text-sm font-medium text-slate-700 mb-1">
-                                    Program Studi <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="study_program" id="study_program"
-                                       value="{{ old('study_program', $user->student?->study_program) }}"
-                                       class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                                              {{ $errors->has('study_program') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
-                                @error('study_program')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                <label for="cohort_year" class="block text-sm font-medium text-slate-700 mb-1">
-                                    Angkatan <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" name="cohort_year" id="cohort_year"
-                                       value="{{ old('cohort_year', $user->student?->cohort_year) }}"
-                                       min="2000" max="2099"
-                                       class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
-                                              {{ $errors->has('cohort_year') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
-                                @error('cohort_year')
-                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="study_program" class="block text-sm font-medium text-slate-700 mb-1">
+                                Program Studi <span class="text-red-500">*</span>
+                            </label>
+                            <select name="study_program" id="study_program"
+                                    class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                                           {{ $errors->has('study_program') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
+                                <option value="">-- Pilih Program Studi --</option>
+                                @foreach(\App\Models\Student::STUDY_PROGRAMS as $program)
+                                    <option value="{{ $program }}" {{ old('study_program', $user->role === 'student' ? $user->student?->study_program : $user->lecturer?->study_program) == $program ? 'selected' : '' }}>
+                                        {{ $program }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('study_program')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
-                    @endif
+
+                        @if($user->role === 'student')
+                        <div>
+                            <label for="cohort_year" class="block text-sm font-medium text-slate-700 mb-1">
+                                Angkatan <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" name="cohort_year" id="cohort_year"
+                                   value="{{ old('cohort_year', $user->student?->cohort_year) }}"
+                                   min="2000" max="2099"
+                                   class="w-full px-3 py-2 border rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+                                          {{ $errors->has('cohort_year') ? 'border-red-400 bg-red-50' : 'border-slate-200' }}">
+                            @error('cohort_year')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        @endif
+                    </div>
 
                     <div>
                         <label for="phone_number" class="block text-sm font-medium text-slate-700 mb-1">

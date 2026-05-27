@@ -59,6 +59,9 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span> Tervalidasi
                                 </span>
                             @endif
+                            @if($report->is_late)
+                                <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-200 mt-1 inline-block">Terlambat</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-right">
                             <a href="{{ route('lecturer.weekly_reports.show', $report) }}" class="inline-flex items-center text-sm font-medium text-primary hover:text-primary-dark bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors">
