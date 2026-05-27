@@ -80,5 +80,7 @@ class InternshipController extends Controller
 
         return redirect()->route('lecturer.internships.index')
             ->with('success', "Pengajuan magang berhasil {$statusText}.");
+
+            
     }
 }

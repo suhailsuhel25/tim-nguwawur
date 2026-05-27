@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Lecturer\DashboardController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
@@ -17,6 +17,22 @@ Route::middleware('auth')->group(function () {
             return view('student.dashboard');
         })->name('dashboard');
 
+
+        Route::get('/profilestudent', function () {
+            return view('student.profilestudent');
+        })->name('profilestudent');
+
+        Route::put('/profilestudent', function () {
+            return back()->with('success', 'Profile berhasil diperbarui.');
+        })->name('profilestudent.update');
+
+        Route::post('/profile/password-update', [ProfileController::class, 'updatePassword'])
+        ->name('profile.password.update');
+
+        Route::get('/setprofilestudent', function () {
+            return view('student.setprofilestudent');
+        })->name('setprofilestudent');
+
         Route::resource('internships', App\Http\Controllers\Student\InternshipController::class)->only(['index', 'create', 'store']);
         Route::resource('weekly_reports', App\Http\Controllers\Student\WeeklyReportController::class)->only(['index', 'create', 'store', 'show']);
 
@@ -28,9 +44,33 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:lecturer')->prefix('dosen')->name('lecturer.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('lecturer.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::get('/lecturer/dashboard', [DashboardController::class, 'index'])
+            ->name('lecturer.dashboard');
+
+        Route::get('/profile', function () {
+            return view('lecturer.profile');
+        })->name('profile');
+
+        Route::put('/profile', function () {
+            return back()->with('success', 'Profile berhasil diperbarui.');
+        })->name('profile.update');
+
+        Route::get('/setprofile', function () {
+            return view('lecturer.setprofile');
+        })->name('setprofile');
+
+        Route::put('/setprofile', function () {
+            return view('lecturer.setprofile');
+        })->name('setprofile');
+
+        Route::get('/Mystudent', [MyStudentController::class, 'index'])
+            ->name('Mystudent.index');
+
+        Route::post('/Mystudent/store', [MyStudentController::class, 'store'])
+            ->name('Mystudent.store');
 
         Route::get('internships', [App\Http\Controllers\Lecturer\InternshipController::class, 'index'])->name('internships.index');
         Route::get('internships/{internship}', [App\Http\Controllers\Lecturer\InternshipController::class, 'show'])->name('internships.show');
@@ -45,6 +85,8 @@ Route::middleware('auth')->group(function () {
         Route::put('mentorship_sessions/{mentorshipSession}/cancel', [App\Http\Controllers\Lecturer\MentorshipSessionController::class, 'cancel'])->name('mentorship_sessions.cancel');
 
         Route::resource('final_grades', App\Http\Controllers\Lecturer\FinalGradeController::class)->except(['destroy'])->parameters(['final_grades' => 'finalGrade']);
+
+        
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

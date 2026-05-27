@@ -16,7 +16,7 @@ class Internship extends Model
 
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class, 'student_id');
     }
 
     public function lecturer(): BelongsTo
@@ -24,9 +24,9 @@ class Internship extends Model
         return $this->belongsTo(Lecturer::class);
     }
 
-    public function company(): BelongsTo
+    public function company()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function internshipPeriod(): BelongsTo
