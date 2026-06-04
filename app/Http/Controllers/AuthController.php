@@ -24,12 +24,12 @@ class AuthController extends Controller
             $user = Auth::user();
 
             if ($user->role === 'student') {
-                return redirect()->intended('/mahasiswa/dashboard');
+                return redirect('/mahasiswa/dashboard');
             } elseif ($user->role === 'lecturer') {
-                return redirect()->intended('/dosen/dashboard');
+                return redirect('/dosen/dashboard');
             }
 
-            return redirect()->intended('/admin/dashboard');
+            return redirect('/admin/dashboard');
         }
 
         return back()->withErrors([

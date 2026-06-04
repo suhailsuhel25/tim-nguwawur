@@ -61,6 +61,8 @@ Route::middleware('auth')->group(function () {
         Route::put('mentorship_sessions/{mentorshipSession}/complete', [App\Http\Controllers\Lecturer\MentorshipSessionController::class, 'complete'])->name('mentorship_sessions.complete');
         Route::put('mentorship_sessions/{mentorshipSession}/cancel', [App\Http\Controllers\Lecturer\MentorshipSessionController::class, 'cancel'])->name('mentorship_sessions.cancel');
         
+        Route::resource('final_grades', App\Http\Controllers\Lecturer\FinalGradeController::class)->except(['destroy'])->parameters(['final_grades' => 'finalGrade']);
+
         Route::get('documents/{document}', [App\Http\Controllers\Lecturer\InternshipController::class, 'viewDocument'])->name('internships.view_document');
         Route::get('students/{internship}', [App\Http\Controllers\Lecturer\InternshipController::class, 'studentShow'])->name('students.show');
     });

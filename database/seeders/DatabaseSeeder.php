@@ -29,7 +29,21 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        // 2. Buat Akun Dosen (3)
+        // 2. Buat Akun Dosen (Fixed)
+        $dosenFixed = User::create([
+            'name' => 'Dr. Budi Santoso, M.Kom.',
+            'username' => '198001012005011001', // NIP Dosen
+            'password' => Hash::make('password'),
+            'role' => 'lecturer',
+        ]);
+        
+        Lecturer::create([
+            'user_id' => $dosenFixed->id,
+            'study_program' => 'Teknologi Informasi',
+            'phone_number' => '081234567890',
+        ]);
+
+        // 2. Buat Akun Dosen Random (3)
         for ($i = 1; $i <= 3; $i++) {
             $dosen = User::create([
                 'name' => $faker->name . ', M.Kom.',
@@ -45,7 +59,22 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 3. Buat Akun Mahasiswa (10)
+        // 3. Buat Akun Mahasiswa (Fixed)
+        $mahasiswaFixed = User::create([
+            'name' => 'Andi Pratama',
+            'username' => '230010012', // NIM Mahasiswa
+            'password' => Hash::make('password'),
+            'role' => 'student',
+        ]);
+        
+        Student::create([
+            'user_id' => $mahasiswaFixed->id,
+            'study_program' => 'Teknologi Informasi',
+            'cohort_year' => '2023',
+            'phone_number' => '089876543210',
+        ]);
+
+        // 3. Buat Akun Mahasiswa Random (10)
         for ($i = 1; $i <= 10; $i++) {
             $mahasiswa = User::create([
                 'name' => $faker->name,
