@@ -20,6 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:student')->prefix('mahasiswa')->name('student.')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Student\DashboardController::class, 'index'])->name('dashboard');
 
+        // Profile & Settings
+        Route::get('/profile', [App\Http\Controllers\Student\ProfileController::class, 'index'])->name('profilestudent');
+        Route::put('/profile', [App\Http\Controllers\Student\ProfileController::class, 'update'])->name('profilestudent.update');
+        Route::get('/settings', [App\Http\Controllers\Student\ProfileController::class, 'showChangePassword'])->name('setprofilestudent');
+        Route::put('/settings', [App\Http\Controllers\Student\ProfileController::class, 'updatePassword'])->name('setprofilestudent.update');
+
         Route::resource('internships', App\Http\Controllers\Student\InternshipController::class)->only(['index', 'create', 'store']);
         Route::resource('weekly_reports', App\Http\Controllers\Student\WeeklyReportController::class)->only(['index', 'create', 'store', 'show']);
         Route::get('weekly_reports/{weeklyReport}/download', [App\Http\Controllers\Student\WeeklyReportController::class, 'downloadDocument'])->name('weekly_reports.download');
@@ -33,6 +39,12 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role:lecturer')->prefix('dosen')->name('lecturer.')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Lecturer\DashboardController::class, 'index'])->name('dashboard');
+
+        // Profile & Settings
+        Route::get('/profile', [App\Http\Controllers\Lecturer\ProfileController::class, 'index'])->name('profile');
+        Route::put('/profile', [App\Http\Controllers\Lecturer\ProfileController::class, 'update'])->name('profile.update');
+        Route::get('/settings', [App\Http\Controllers\Lecturer\ProfileController::class, 'showChangePassword'])->name('setprofile');
+        Route::put('/settings', [App\Http\Controllers\Lecturer\ProfileController::class, 'updatePassword'])->name('setprofile.update');
 
         Route::get('internships', [App\Http\Controllers\Lecturer\InternshipController::class, 'index'])->name('internships.index');
         Route::get('students', [App\Http\Controllers\Lecturer\InternshipController::class, 'students'])->name('students.index');
