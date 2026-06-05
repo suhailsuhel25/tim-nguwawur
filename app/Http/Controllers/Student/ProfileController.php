@@ -26,12 +26,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'phone_number' => 'nullable|string|max:20',
-        ]);
-
-        $user->update([
-            'name' => $validated['name'],
         ]);
 
         if ($user->student) {

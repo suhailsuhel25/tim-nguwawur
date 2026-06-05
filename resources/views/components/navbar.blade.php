@@ -99,6 +99,14 @@
                     <p class="text-sm font-medium text-slate-900">{{ Auth::user()->name ?? 'User' }}</p>
                     <p class="text-xs text-slate-500 truncate">{{ Auth::user()->username ?? 'ID' }}</p>
                 </div>
+                @if(Auth::user()->role === 'student')
+                    <a href="{{ route('student.profilestudent') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Profile</a>
+                    <a href="{{ route('student.setprofilestudent') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Ubah Password</a>
+                @elseif(Auth::user()->role === 'lecturer')
+                    <a href="{{ route('lecturer.profile') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Profile</a>
+                    <a href="{{ route('lecturer.setprofile') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">Ubah Password</a>
+                @endif
+                <div class="border-t border-slate-100 my-1"></div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Sign Out</button>

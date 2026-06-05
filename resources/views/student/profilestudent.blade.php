@@ -74,7 +74,7 @@
             @csrf
             @method('PUT')
 
-            {{-- Nama --}}
+            {{-- Nama (readonly) --}}
             <div>
 
                 <label class="block text-sm font-semibold text-slate-700 mb-2">
@@ -82,15 +82,11 @@
                 </label>
 
                 <input type="text"
-                       name="name"
-                       value="{{ old('name', Auth::user()->name) }}"
-                       class="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300">
+                       value="{{ Auth::user()->name }}"
+                       class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed"
+                       readonly>
 
-                @error('name')
-                    <p class="text-sm text-red-500 mt-2">
-                        {{ $message }}
-                    </p>
-                @enderror
+                <p class="text-xs text-slate-400 mt-1">Nama lengkap tidak dapat diubah.</p>
 
             </div>
 

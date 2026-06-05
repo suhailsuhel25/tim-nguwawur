@@ -36,86 +36,10 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'lecturer',
         ]);
-        
+
         Lecturer::create([
             'user_id' => $dosenFixed->id,
-            'study_program' => 'Teknologi Informasi',
-            'phone_number' => '081234567890',
         ]);
 
-        // 2. Buat Akun Dosen Random (3)
-        for ($i = 1; $i <= 3; $i++) {
-            $dosen = User::create([
-                'name' => $faker->name . ', M.Kom.',
-                'username' => $faker->unique()->numerify('198#######200#######'),
-                'password' => Hash::make('password'),
-                'role' => 'lecturer',
-            ]);
-            
-            Lecturer::create([
-                'user_id' => $dosen->id,
-                'study_program' => $faker->randomElement(Student::STUDY_PROGRAMS),
-                'phone_number' => $faker->phoneNumber,
-            ]);
-        }
-
-        // 3. Buat Akun Mahasiswa (Fixed)
-        $mahasiswaFixed = User::create([
-            'name' => 'Andi Pratama',
-            'username' => '230010012', // NIM Mahasiswa
-            'password' => Hash::make('password'),
-            'role' => 'student',
-        ]);
-        
-        Student::create([
-            'user_id' => $mahasiswaFixed->id,
-            'study_program' => 'Teknologi Informasi',
-            'cohort_year' => '2023',
-            'phone_number' => '089876543210',
-        ]);
-
-        // 3. Buat Akun Mahasiswa Random (10)
-        for ($i = 1; $i <= 10; $i++) {
-            $mahasiswa = User::create([
-                'name' => $faker->name,
-                'username' => $faker->unique()->numerify('2300#####'),
-                'password' => Hash::make('password'),
-                'role' => 'student',
-            ]);
-            
-            Student::create([
-                'user_id' => $mahasiswa->id,
-                'study_program' => $faker->randomElement(Student::STUDY_PROGRAMS),
-                'cohort_year' => $faker->randomElement(['2022', '2023']),
-                'phone_number' => $faker->phoneNumber,
-            ]);
-        }
-
-        // 4. Buat Data Dummy Perusahaan (5)
-        for ($i = 1; $i <= 5; $i++) {
-            Company::create([
-                'name' => $faker->company,
-                'address' => $faker->address,
-                'industry' => $faker->randomElement(['Software Development', 'IT Consultant', 'Digital Agency', 'E-Commerce', 'Fintech']),
-                'contact_person' => $faker->name,
-                'contact_email' => $faker->companyEmail,
-                'contact_phone' => $faker->phoneNumber,
-            ]);
-        }
-
-        // 5. Buat Data Dummy Periode Magang (2)
-        InternshipPeriod::create([
-            'name' => 'Ganjil 2026/2027',
-            'start_date' => Carbon::now()->addDays(7),
-            'end_date' => Carbon::now()->addMonths(4),
-            'is_active' => true,
-        ]);
-
-        InternshipPeriod::create([
-            'name' => 'Genap 2025/2026',
-            'start_date' => Carbon::now()->subMonths(6),
-            'end_date' => Carbon::now()->subMonths(2),
-            'is_active' => false,
-        ]);
     }
 }
